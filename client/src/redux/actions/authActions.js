@@ -112,7 +112,7 @@ export const getMe = () => dispatch => {
 }
 
 
-export const logout = () => dispatch => {
+export const logout = (msg) => dispatch => {
     dispatch({
         type: GLOBAL_TYPES.NOTIFY,
         payload: {loading: true}
@@ -125,10 +125,11 @@ export const logout = () => dispatch => {
             type: GLOBAL_TYPES.LOGIN,
             payload: {}
         });
-
+        
+        const notify = (msg) ? {error: msg} : {};
         dispatch({
             type: GLOBAL_TYPES.NOTIFY,
-            payload: {}
+            payload: notify
         });
     }, 1500)
 }

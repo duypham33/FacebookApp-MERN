@@ -1,6 +1,6 @@
 import GLOBAL_TYPES from '../actions/globalTypes';
 
-const initialState = false
+const initialState = false;
 
 const themeReducer = (state = initialState, action) => {
     switch (action.type){

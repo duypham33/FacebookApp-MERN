@@ -36,7 +36,8 @@ const authController = {
             const {email, password} = req.body;
             //console.log(email, password);
             //Find email
-            const user = await userModel.findOne({email: email});
+            const user = await userModel.findOne({email: email}).
+            populate("follwers following", "_id, fullname, username");
             //console.log(user)
             if(!user)
                 return res.status(404).send({msg: "Email does not exist!"});
@@ -83,7 +84,8 @@ const authController = {
             if(!payload)
                 return res.status(404).send({msg: "Please, log in!"});
             
-            const user = await userModel.findById(payload.id);
+            const user = await userModel.findById(payload.id).
+            populate("follwers following", "_id, fullname, username");
             const access_token = getAccessToken(payload);
             
             res.json({
@@ -102,7 +104,8 @@ const authController = {
             //console.log(req);
             const userID = req.userID;
             //console.log(userID);
-            const user = await userModel.findById(userID);
+            const user = await userModel.findById(userID).
+            populate("follwers following", "_id, fullname, username");
             //console.log(user);
             if(!user)
                 return res.status(404).send({msg: "Invalid token!"});

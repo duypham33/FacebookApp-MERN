@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from 'react';
-//import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../redux/actions/authActions';
 import axios from 'axios';
 //import GLOBAL_TYPES from '../../redux/actions/globalTypes';
-//import UserCard from '../UserCard'
-//import LoadIcon from '../../images/loading.gif'
+import LoadIcon from '../../static/images/loading.gif';
 import {Link} from 'react-router-dom';
 import UserCard from '../UserCard';
 
 const Search = () => {
     const [search, setSearch] = useState('');
     const [users, setUsers] = useState([]);
+    const [load, setLoad] = useState(false);
 
+    const dispatch = useDispatch();
     useEffect(() => {
         if(search.length > 1){
+            setLoad(true);
             axios.get(`api/users/search?kw=${search}`).then(res => {
                 setUsers(res.data.users);
-    
+                setLoad(false);
             }).catch(err => {
-                console.log(err);
+                if(err.response.status === 401)
+                    dispatch(logout(err.response.data));
+                //console.log(err);
             });
         } 
         else
@@ -54,9 +59,9 @@ const Search = () => {
 
             {/* <button type="submit" style={{display: 'none'}}>Search</button> */}
 
-            {/* { load && <img className="loading" src={LoadIcon} alt="loading"  /> }
+            { load && <img className="loading" src={LoadIcon} alt="loading"  /> }
 
-            <div className="users">
+            {/* <div className="users">
                 {
                     search && users.map(user => (
                         <UserCard 
@@ -67,12 +72,12 @@ const Search = () => {
                         />
                     ))
                 }
-            </div>  */}
+            </div>   */}
             <div className="users">
                 {
                     users.map((user, index) => (
                         <Link key={index} to={`profile/${user._id}`} onClick={handleClose} >
-                            <UserCard user={user} border="border" />
+                            <UserCard user={user} border="border"  />
                         </Link>
                     ))
                 }

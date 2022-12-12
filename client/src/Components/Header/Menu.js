@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/actions/authActions';
 import GLOBAL_TYPES from '../../redux/actions/globalTypes';
 import Avatar from '../Avatar';
+import { inverterContext } from '../../App';
 
 const Menu = () => {
     const navLinks = [
@@ -15,6 +16,7 @@ const Menu = () => {
     const { auth, theme } = useSelector(state => state);
     const dispatch = useDispatch();
     const { pathname } = useLocation();
+    const {inverter, setInverter} = useContext(inverterContext);
 
     const isActive = (pn) => {
         if(pn === pathname) return 'active';
@@ -64,9 +66,10 @@ const Menu = () => {
                     <Link className="dropdown-item" to={`/profile/${auth.user._id}`}>Profile</Link>
 
                     <label htmlFor="theme" className="dropdown-item"
-                    onClick={() => dispatch({
-                        type: GLOBAL_TYPES.THEME, payload: !theme
-                    })}>
+                    onClick={() => {
+                        dispatch({type: GLOBAL_TYPES.THEME, payload: !theme});
+                        setInverter(1 - inverter);
+                    }}>
 
                         {theme ? 'Light mode' : 'Dark mode'}
                     </label>

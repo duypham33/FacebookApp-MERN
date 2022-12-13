@@ -6,7 +6,8 @@ const userCtrl = {
             const kw = req.query.kw;
             //console.log(kw);
             const users = await userModel.find({ $or: [{fullname: {$regex: kw}}, {username: {$regex: kw}},
-            {email: {$regex: kw}}] }).limit(10).select("fullname username avatar");
+            {email: {$regex: kw}}] }).limit(10).select("fullname username avatar").
+            populate("followers following", "_id fullname username avatar");
             //console.log(users);
             return res.status(200).send({users: users});
         }
@@ -18,7 +19,7 @@ const userCtrl = {
     getUser: async (req, res) => {
         try {
             const user = await userModel.findById(req.params.id).select("-password").
-            populate("follwers following", "_id, fullname, username");
+            populate("followers following", "_id fullname username avatar");
             if(!user)
                 return res.status(404);
 
@@ -45,7 +46,8 @@ const userCtrl = {
                 story: story,
                 gender: gender,
                 avatar: avatar
-            }, {new: true}).select("-password").populate("follwers following", "_id, fullname, username");
+            }, {new: true}).select("-password").
+            populate("followers following", "_id fullname username avatar");
 
             if(!user)
                 return res.status(404);
@@ -65,7 +67,8 @@ const userCtrl = {
             
             const user = await userModel.findByIdAndUpdate(req.params.id, {
                 $push: {following: req.body.targetID}
-            }, {new: true}).select("-password").populate("follwers following", "_id, fullname, username");
+            }, {new: true}).select("-password").
+            populate("followers following", "_id fullname username avatar");
             
             return res.status(200).send({user: user});
 
@@ -82,7 +85,8 @@ const userCtrl = {
             
             const user = await userModel.findByIdAndUpdate(req.params.id, {
                 $pull: {following: req.body.targetID}
-            }, {new: true}).select("-password").populate("follwers following", "_id, fullname, username");
+            }, {new: true}).select("-password").
+            populate("followers following", "_id fullname username avatar");
             
             return res.status(200).send({user: user});
 

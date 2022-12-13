@@ -3,12 +3,14 @@ import React from 'react';
 import Avatar from '../Avatar';
 import EditProfile from './EditProfile';
 import FollowBtn from '../FollowBtn';
+import Follow from './Follow';
 //import GLOBAL_TYPES from '../../redux/actions/globalTypes';
 
 const Info = ({id, auth, user}) => {
     const [onEdit, setOnEdit] = useState(false);
     const numFollowers = user.followers ? user.followers.length : 0;
-
+    const [showFollow, setShowFollow] = useState(null);
+    
     return (
         <div className="info">
             <div className="info_container" key={user._id}>
@@ -32,10 +34,10 @@ const Info = ({id, auth, user}) => {
                     </div>
 
                     <div className="follow_btn">
-                        <span className="mr-4">
+                        <span className="mr-4" onClick={() => setShowFollow("followers")}>
                             {numFollowers} {numFollowers > 1 ? 'Followers' : 'Follower'}
                         </span>
-                        <span className="ml-4">
+                        <span className="ml-4" onClick={() => setShowFollow("following")}>
                             {user.following ? user.following.length : 0} Following
                         </span>
                     </div>
@@ -51,6 +53,15 @@ const Info = ({id, auth, user}) => {
 
                 {
                     onEdit && <EditProfile setOnEdit={setOnEdit} />
+                }
+
+                {
+                    showFollow &&
+                    <Follow 
+                    users={showFollow === 'followers' ? user.followers : user.following}
+                    showFollow={showFollow} 
+                    setShowFollow={setShowFollow} 
+                    />
                 }
 
                 {/* {

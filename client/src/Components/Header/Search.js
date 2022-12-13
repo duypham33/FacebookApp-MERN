@@ -4,7 +4,7 @@ import { logout } from '../../redux/actions/authActions';
 import axios from 'axios';
 //import GLOBAL_TYPES from '../../redux/actions/globalTypes';
 import LoadIcon from '../../static/images/loading.gif';
-import {Link} from 'react-router-dom';
+//import {Link} from 'react-router-dom';
 import UserCard from '../UserCard';
 
 const Search = () => {
@@ -76,9 +76,7 @@ const Search = () => {
             <div className="users">
                 {
                     users.map((user, index) => (
-                        <Link key={index} to={`profile/${user._id}`} onClick={handleClose} >
-                            <UserCard user={user} border="border"  />
-                        </Link>
+                        <UserCard user={user} border="border" handleClose={handleClose}  />
                     ))
                 }
             </div>

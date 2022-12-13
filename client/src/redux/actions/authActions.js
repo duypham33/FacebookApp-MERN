@@ -131,5 +131,7 @@ export const logout = (msg) => dispatch => {
             type: GLOBAL_TYPES.NOTIFY,
             payload: notify
         });
+
+        dispatch({type: GLOBAL_TYPES.RESET_POSTS, payload: null});
     }, 1500)
 }

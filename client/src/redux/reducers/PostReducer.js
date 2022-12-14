@@ -7,12 +7,6 @@ const initialState = {
     myposts: []
 };
 
-const updateOneInPosts = (posts, updatedPost) => {
-    const newData = posts.filter(post => post._id !== updatedPost._id);
-    newData.unshift(updatedPost);
-
-    return newData
-}
 
 const postReducer = (state = initialState, action) => {
     switch (action.type){
@@ -28,14 +22,39 @@ const postReducer = (state = initialState, action) => {
         case GLOBAL_TYPES.UPDATE_POST:
             return {
                 ...state,
-                homePosts: updateOneInPosts(state.homePosts, action.payload),
-                myposts: updateOneInPosts(state.myposts, action.payload)
+                homePosts: updateOneInPostsMoveToHead(state.homePosts, action.payload),
+                myposts: updateOneInPostsMoveToHead(state.myposts, action.payload)
             }
         case GLOBAL_TYPES.RESET_POSTS:
             return initialState;
+        case GLOBAL_TYPES.UPDATE_LIKE:
+            if (action.payload.isMyPost === true)
+                return {
+                    ...state,
+                    homePosts: updateOneInPosts(state.homePosts, action.payload.newPost),
+                    myposts: updateOneInPosts(state.myposts, action.payload.newPost)
+                }
+            return {
+                ...state,
+                homePosts: updateOneInPosts(state.homePosts, action.payload.newPost)
+            }
+
+
         default:
             return state;
     }
+}
+
+const updateOneInPostsMoveToHead = (posts, updatedPost) => {
+    const newData = posts.filter(post => post._id !== updatedPost._id);
+    newData.unshift(updatedPost);
+
+    return newData;
+}
+
+const updateOneInPosts = (posts, updatedPost) => {
+    
+    return posts.map(post => post._id !== updatedPost._id ? post : updatedPost);
 }
 
 

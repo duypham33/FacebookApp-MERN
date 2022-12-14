@@ -88,3 +88,43 @@ export const updatePost = ({content, images, auth, status}) => async dispatch =>
         }
     }
 }
+
+
+export const LikePost = (post, auth) => dispatch => {
+    dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
+    const newPost = {...post, likes: [...post.likes, auth.user]};
+    dispatch({type: GLOBAL_TYPES.UPDATE_LIKE, payload: {
+        newPost: newPost, 
+        isMyPost: post.author._id === auth.user._id
+    }});
+
+    axios.patch(`api/posts/${post._id}/like`).then(res => {
+        dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: false} });
+
+    }).catch(err => {
+        if(err.response.status === 401)
+            dispatch(logout("Your session expired! Please, login again!"));
+        else
+            dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: false} });
+    })
+}
+
+
+export const UnLikePost = (post, auth) => dispatch => {
+    dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
+    const newPost = {...post, likes: post.likes.filter(user => user._id !== auth.user._id)};
+    dispatch({type: GLOBAL_TYPES.UPDATE_LIKE, payload: {
+        newPost: newPost, 
+        isMyPost: post.author._id === auth.user._id
+    }});
+
+    axios.patch(`api/posts/${post._id}/unlike`).then(res => {
+        dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: false} });
+
+    }).catch(err => {
+        if(err.response.status === 401)
+            dispatch(logout("Your session expired! Please, login again!"));
+        else
+            dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: false} });
+    })
+}

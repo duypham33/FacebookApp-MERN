@@ -7,5 +7,6 @@ router.get('/:id', [authMiddleware.isAuthenticated], userCtrl.getUser);
 router.patch('/:id/update', [authMiddleware.isAuthenticated], userCtrl.updateProfile);
 router.patch('/:id/follow', [authMiddleware.isAuthenticated], userCtrl.follow);
 router.patch('/:id/unfollow', [authMiddleware.isAuthenticated], userCtrl.unfollow);
+router.get('/search/knowns', [authMiddleware.isAuthenticated], userCtrl.searchKnowns);
 
 module.exports = router;

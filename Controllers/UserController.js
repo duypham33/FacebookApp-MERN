@@ -30,7 +30,7 @@ const userCtrl = {
             // console.log(targetUser !== null);
             return res.status(200).send({user: user});
 
-        } catch (error) {
+        } catch (err) {
             return res.status(500).send({msg: err.message});
         }
     },
@@ -93,7 +93,39 @@ const userCtrl = {
         } catch (error) {
             return res.status(500).send({msg: err.message});
         }
-    }
+    },
+
+    searchKnowns: async (req, res) => {
+        try{
+            const kw = req.query.kw;
+            console.log(kw);
+            let users = null;
+            if(kw === '@' || kw === ''){
+                users = await userModel.find({
+                    $or:[{followers: req.userID}, {following: req.userID}]
+                }).limit(7).select("fullname username avatar")
+            }
+            else{
+                users = await userModel.find({
+                    $and: [
+                        {
+                            $or:[{followers: req.userID}, {following: req.userID}]
+                        },
+                        {
+                            $or: [{fullname: {$regex: kw}}, {username: {$regex: kw}},
+                                {email: {$regex: kw}}]
+                        }
+                    ]
+                }).limit(7).select("fullname username avatar");
+            }
+                
+            console.log(users);
+            return res.status(200).send({users: users});
+        }
+        catch(err){
+            return res.status(500).send({msg: err.message});
+        }
+    },
 }
 
 module.exports = userCtrl;

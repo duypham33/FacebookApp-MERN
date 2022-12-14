@@ -29,7 +29,7 @@ const postCtrl = {
             
             const user = await userModel.findById(req.userID);
             const homePosts = await postModel.find({author: {$in: [...user.following, user._id]}}).
-            sort("-updatedAt").populate("author", "fullname username avatar");
+            sort("-updatedAt").populate("author likes", "fullname username avatar");
             
             return res.status(200).send({
                 myposts: myposts,
@@ -47,13 +47,41 @@ const postCtrl = {
             const post = await postModel.findByIdAndUpdate(req.params.id, {
                 content: req.body.content,
                 images: req.body.images
-            }, {new: true}).populate("author", "fullname username avatar");
+            }, {new: true}).populate("author likes", "fullname username avatar");
             
             return res.status(200).send({
                 updatedPost: post,
                 msg: 'Your post is updated!'
             });
 
+        } catch (error) {
+            return res.status(500).send({msg: error.message});
+        }
+    },
+
+    likePost: async (req, res) => {
+        try {
+            await postModel.findByIdAndUpdate(req.params.id, {
+                $push: {likes: req.userID}
+            }, {new: true, upsert: true, timestamps: false});
+
+            return res.status(200).send({
+                msg: 'You liked the post!'
+            });
+        } catch (error) {
+            return res.status(500).send({msg: error.message});
+        }
+    },
+
+    unlikePost: async (req, res) => {
+        try {
+            await postModel.findByIdAndUpdate(req.params.id, {
+                $pull: {likes: req.userID}
+            }, {new: true, upsert: true, timestamps: false});
+
+            return res.status(200).send({
+                msg: 'You unliked the post!'
+            });
         } catch (error) {
             return res.status(500).send({msg: error.message});
         }

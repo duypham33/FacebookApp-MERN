@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { createComment } from '../../redux/actions/commentActions';
-import axios from 'axios';
-import UserCard from '../UserCard';
+import TagCard from '../TagCard';
+import {handleInput} from '../../utils/handleTagUsers';
 
 const InputComment = ({children, post}) => {
     const [content, setContent] = useState('');
@@ -13,52 +13,12 @@ const InputComment = ({children, post}) => {
 
     const { auth, theme } = useSelector(state => state);
     const dispatch = useDispatch();
-
-    const handleInput = e => {
-        const lastSymbol = content.length > 0 ? content.slice(-1) : '';
-        setContent(e.target.value);
-
-        if(e.nativeEvent.inputType === "deleteContentBackward" 
-        && (lastSymbol === '@' || !e.target.value)){
-            setTagging(null);
-            setKw("");
-            setUsers([]);
-        }
     
-
-        if(tagging !== null){
-            if(content.length - tagging >= 10){
-                setTagging(null);
-                setKw("");
-                setUsers([]);
-            }
-            else{
-                const newKw = e.nativeEvent.data ? kw + e.nativeEvent.data : kw.slice(0, -1);
-                
-                if(newKw.trim()){
-                    axios.get(`api/users/search/knowns?kw=${newKw}`).then(res => {
-                        setUsers(res.data.users);
-                    });
-                }
-
-                setKw(newKw);
-            }
-        }
-
-        if(e.nativeEvent.data === '@'){
-            axios.get(`api/users/search/knowns?kw=@`).then(res => {
-                setUsers(res.data.users);
-            });
-            setTagging(e.target.value.length - 1);
-            setKw("");
-        }
-            
-        else if(e.nativeEvent.data === ' ' && lastSymbol === '@'){
-            setTagging(null);
-            setKw("");
-            setUsers([]);
-        }
+    const handleComment = e => {
+        handleInput({e, content, setContent, tagging, setTagging, kw,
+            setKw, setUsers, tags, setTags});
     }
+    
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -66,10 +26,12 @@ const InputComment = ({children, post}) => {
             return;
         
         const newComment = {
+            author: auth.user,
             content,
             likes: [],
-            author: auth.user,
+            tags: tags.filter(tag => tag.userId).map(tag => tag.userId),
             createdAt: new Date().toISOString(),
+            postId: post._id
         }
         
         dispatch(createComment(newComment, post, auth));
@@ -83,7 +45,7 @@ const InputComment = ({children, post}) => {
         <form className="card-footer comment_input search_form" onSubmit={handleSubmit} >
             {children}
             <input type="text" placeholder="Add your comments..."
-            value={content} onChange={handleInput}
+            value={content} onChange={handleComment}
             style={{
                 filter: theme ? 'invert(1)' : 'invert(0)',
                 color: theme ? 'white' : '#111',
@@ -96,8 +58,10 @@ const InputComment = ({children, post}) => {
 
             <div className="users">
                 {
-                    users.map((user, index) => (
-                        <UserCard user={user} border="border" />
+                    users.map(user => (
+                        <TagCard user={user} border="border" 
+                        data={{content, setContent, tagging, setTagging, kw,
+                            setKw, setUsers, tags, setTags}} />
                     ))
                 }
             </div>

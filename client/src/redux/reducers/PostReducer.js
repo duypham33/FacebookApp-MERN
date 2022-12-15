@@ -27,7 +27,7 @@ const postReducer = (state = initialState, action) => {
             }
         case GLOBAL_TYPES.RESET_POSTS:
             return initialState;
-        case GLOBAL_TYPES.UPDATE_LIKE:
+        case GLOBAL_TYPES.UPDATE_POST_INORDER:
             if (action.payload.isMyPost === true)
                 return {
                     ...state,

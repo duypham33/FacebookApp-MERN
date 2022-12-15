@@ -93,7 +93,7 @@ export const updatePost = ({content, images, auth, status}) => async dispatch =>
 export const LikePost = (post, auth) => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
     const newPost = {...post, likes: [...post.likes, auth.user]};
-    dispatch({type: GLOBAL_TYPES.UPDATE_LIKE, payload: {
+    dispatch({type: GLOBAL_TYPES.UPDATE_POST_INORDER, payload: {
         newPost: newPost, 
         isMyPost: post.author._id === auth.user._id
     }});
@@ -113,7 +113,7 @@ export const LikePost = (post, auth) => dispatch => {
 export const UnLikePost = (post, auth) => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
     const newPost = {...post, likes: post.likes.filter(user => user._id !== auth.user._id)};
-    dispatch({type: GLOBAL_TYPES.UPDATE_LIKE, payload: {
+    dispatch({type: GLOBAL_TYPES.UPDATE_POST_INORDER, payload: {
         newPost: newPost, 
         isMyPost: post.author._id === auth.user._id
     }});

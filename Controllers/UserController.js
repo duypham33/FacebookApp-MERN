@@ -98,7 +98,7 @@ const userCtrl = {
     searchKnowns: async (req, res) => {
         try{
             const kw = req.query.kw;
-            console.log(kw);
+            //console.log(kw);
             let users = null;
             if(kw === '@' || kw === ''){
                 users = await userModel.find({
@@ -119,7 +119,7 @@ const userCtrl = {
                 }).limit(7).select("fullname username avatar");
             }
                 
-            console.log(users);
+            //console.log(users);
             return res.status(200).send({users: users});
         }
         catch(err){

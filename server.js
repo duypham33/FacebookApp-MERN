@@ -26,6 +26,7 @@ mongoose.connect(URI, {
 app.use('/api/auth', require('./Routes/AuthRouter'));
 app.use('/api/users', require('./Routes/UserRouter'));
 app.use('/api/posts', require('./Routes/PostRouter'));
+app.use('/api/comments', require('./Routes/CommentRouter'));
 
 
 app.listen(process.env.PORT, () => {

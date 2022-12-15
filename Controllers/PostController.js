@@ -29,7 +29,14 @@ const postCtrl = {
             
             const user = await userModel.findById(req.userID);
             const homePosts = await postModel.find({author: {$in: [...user.following, user._id]}}).
-            sort("-updatedAt").populate("author likes", "fullname username avatar");
+            sort("-updatedAt").populate("author likes", "fullname username avatar").
+            populate({
+                path: "comments",
+                populate: {
+                    path: "author likes",
+                    select: "fullname username avatar"
+                }
+            });
             
             return res.status(200).send({
                 myposts: myposts,
@@ -47,7 +54,14 @@ const postCtrl = {
             const post = await postModel.findByIdAndUpdate(req.params.id, {
                 content: req.body.content,
                 images: req.body.images
-            }, {new: true}).populate("author likes", "fullname username avatar");
+            }, {new: true}).populate("author likes", "fullname username avatar").
+            populate({
+                path: "comments",
+                populate: {
+                    path: "author likes",
+                    select: "fullname username avatar"
+                }
+            });
             
             return res.status(200).send({
                 updatedPost: post,

@@ -4,7 +4,7 @@ import { createComment } from '../../redux/actions/commentActions';
 import TagCard from '../TagCard';
 import {handleInput} from '../../utils/handleTagUsers';
 
-const InputComment = ({children, post}) => {
+const InputComment = ({post, onReply, setOnReply}) => {
     const [content, setContent] = useState('');
     const [tagging, setTagging] = useState(null);
     const [kw, setKw] = useState('');
@@ -13,7 +13,6 @@ const InputComment = ({children, post}) => {
 
     const { auth, theme } = useSelector(state => state);
     const dispatch = useDispatch();
-    
     const handleComment = e => {
         handleInput({e, content, setContent, tagging, setTagging, kw,
             setKw, setUsers, tags, setTags});
@@ -31,7 +30,8 @@ const InputComment = ({children, post}) => {
             likes: [],
             tags: tags.filter(tag => tag.userId).map(tag => tag.userId),
             createdAt: new Date().toISOString(),
-            postId: post._id
+            postId: post._id,
+            reply: onReply ? (onReply.reply ? onReply.reply : onReply._id) : null
         }
         
         dispatch(createComment(newComment, post, auth));
@@ -39,11 +39,12 @@ const InputComment = ({children, post}) => {
         setTagging(null);
         setKw('');
         setTags([]);
+
+        setOnReply(false);
     }
 
     return (
         <form className="card-footer comment_input search_form" onSubmit={handleSubmit} >
-            {children}
             <input type="text" placeholder="Add your comments..."
             value={content} onChange={handleComment}
             style={{

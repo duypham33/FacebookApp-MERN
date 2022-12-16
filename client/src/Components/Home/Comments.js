@@ -11,7 +11,7 @@ const Comments = ({post}) => {
     useEffect(() => {
         const newCm = post.comments.filter(cm => !cm.reply);
         setComments(newCm);
-        setShowComments(newCm.slice(newCm.length - next));
+        setShowComments(newCm.slice(next <= newCm.length ? newCm.length - next : 0));
     },[post.comments, next]);
 
     useEffect(()=> {
@@ -29,10 +29,10 @@ const Comments = ({post}) => {
             }
 
             {
-                comments.length - next > 0
+                next < comments.length
                 ? <div className="p-2 border-top"
                 style={{cursor: 'pointer', color: 'crimson'}}
-                onClick={() => setNext(next + 10)}>
+                onClick={() => setNext(next + 5)}>
                     See more comments...
                 </div>
 

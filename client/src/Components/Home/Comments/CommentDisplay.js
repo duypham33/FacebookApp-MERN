@@ -6,12 +6,12 @@ const CommentDisplay = ({comment, post, replyCm}) => {
     const [next, setNext] = useState(1);
 
     useEffect(() => {
-        setShowRep(replyCm.slice(replyCm.length - next))
+        setShowRep(replyCm.slice(next <= replyCm.length ? replyCm.length - next : 0));
     },[replyCm, next])
 
     return (
         <div className="comment_display">
-            <CommentCard comment={comment} post={post} commentId={comment._id} >
+            <CommentCard comment={comment} post={post} >
                 <div className="pl-4">
                     {
                         showRep.map((item, index) => (
@@ -20,15 +20,14 @@ const CommentDisplay = ({comment, post, replyCm}) => {
                             key={index}
                             comment={item}
                             post={post}
-                            commentId={comment._id}
                              />
                         ))
                     }
 
                     {
-                        replyCm.length - next > 0
+                        next < replyCm.length
                         ? <div style={{cursor: 'pointer', color: 'crimson'}}
-                        onClick={() => setNext(next + 10)}>
+                        onClick={() => setNext(next + 5)}>
                             See more comments...
                         </div>
 

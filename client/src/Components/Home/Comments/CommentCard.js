@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import Avatar from '../../Avatar'
-import { Link } from 'react-router-dom'
-import moment from 'moment'
+import React, { useState, useEffect } from 'react';
+import Avatar from '../../Avatar';
+import { Link } from 'react-router-dom';
+import moment from 'moment';
 
-import LikeBtn from '../../LikeBtn'
-import { useSelector, useDispatch } from 'react-redux'
-import CommentMenu from './CommentMenu'
-//import { updateComment, likeComment, unLikeComment } from '../../../redux/actions/commentAction'
-import InputComment from '../InputComment'
+import LikeBtn from '../../LikeBtn';
+import { useSelector, useDispatch } from 'react-redux';
+import CommentMenu from './CommentMenu';
+import { updateComment } from '../../../redux/actions/commentActions';
+import InputComment from '../InputComment';
 
-const CommentCard = ({children, comment, post, commentId}) => {
+
+const CommentCard = ({children, comment, post}) => {
     const { auth, theme } = useSelector(state => state);
     const dispatch = useDispatch();
 
@@ -17,59 +18,43 @@ const CommentCard = ({children, comment, post, commentId}) => {
     const [readMore, setReadMore] = useState(false);
 
     const [onEdit, setOnEdit] = useState(false);
-    const [isLike, setIsLike] = useState(false);
-    //const [loadLike, setLoadLike] = useState(false);
+    const [isLike, setLike] = useState(false);
 
-    //const [onReply, setOnReply] = useState(false);
+    const [onReply, setOnReply] = useState(false);
 
 
     useEffect(() => {
-        setContent(comment.content)
-        setIsLike(false)
-        //setOnReply(false)
-        if(comment.likes.find(like => like._id === auth.user._id)){
-            setIsLike(true)
-        }
-    },[comment, auth.user._id])
+        setContent(comment.content);
+        setLike(false);
+        setOnReply(false);
+        
+        if(comment.likes.find(like => like._id === auth.user._id))
+            setLike(true);
+        
+    },[comment, auth.user._id]);
 
-    // const handleUpdate = () => {
-    //     if(comment.content !== content){
-    //         dispatch(updateComment({comment, post, content, auth}))
-    //         setOnEdit(false)
-    //     }else{
-    //         setOnEdit(false)
-    //     }
-    // }
-
-
-    // const handleLike = async () => {
-    //     if(loadLike) return;
-    //     setIsLike(true)
-
-    //     setLoadLike(true)
-    //     await dispatch(likeComment({comment, post, auth}))
-    //     setLoadLike(false)
-    // }
-
-    // const handleUnLike = async () => {
-    //     if(loadLike) return;
-    //     setIsLike(false)
-
-    //     setLoadLike(true)
-    //     await dispatch(unLikeComment({comment, post, auth}))
-    //     setLoadLike(false)
-    // }
+    const handleUpdate = () => {
+        if(comment.content !== content)
+            dispatch(updateComment(comment, post, content, auth));
+        
+        setOnEdit(false);
+    }
 
 
-    // const handleReply = () => {
-    //     if(onReply) return setOnReply(false)
-    //     setOnReply({...comment, commentId})
-    // }
+    const handleReply = () => {
+        if(onReply) 
+            return setOnReply(false);
+        
+        setOnReply(comment);
+    }
 
     const styleCard = {
         opacity: comment._id ? 1 : 0.5,
         pointerEvents: comment._id ? 'inherit' : 'none'
     }
+
+    // const l = `<Link to={\`/profile/${comment.author._id}\`} className="d-flex text-dark">
+    // @${comment.author.username} </Link> Hello everyone`;
 
     return (
         <div className="comment_card mt-2" style={styleCard}>
@@ -90,12 +75,6 @@ const CommentCard = ({children, comment, post, commentId}) => {
                         onChange={e => setContent(e.target.value)} />
 
                         : <div>
-                            {/* {
-                                comment.tag && comment.tag._id !== comment.user._id &&
-                                <Link to={`/profile/${comment.tag._id}`} className="mr-1">
-                                    @{comment.tag.username}
-                                </Link>
-                            } */}
                             <span>
                                 {
                                     content.length < 100 ? content :
@@ -121,7 +100,7 @@ const CommentCard = ({children, comment, post, commentId}) => {
                             {comment.likes.length} {comment.likes.length > 1 ? 'likes' : 'like'}
                         </small>
 
-                        {/* {
+                        {
                             onEdit
                             ? <>
                                 <small className="font-weight-bold mr-3"
@@ -129,7 +108,10 @@ const CommentCard = ({children, comment, post, commentId}) => {
                                     update
                                 </small>
                                 <small className="font-weight-bold mr-3"
-                                onClick={() => setOnEdit(false)}>
+                                onClick={() => {
+                                    setOnEdit(false);
+                                    setContent(comment.content);
+                                    }}>
                                     cancel
                                 </small>
                             </>
@@ -139,7 +121,7 @@ const CommentCard = ({children, comment, post, commentId}) => {
                                 {onReply ? 'cancel' :'reply'}
                             </small>
                         }
-                         */}
+                        
                     </div>
                     
                 </div>
@@ -147,18 +129,14 @@ const CommentCard = ({children, comment, post, commentId}) => {
 
                 <div className="d-flex align-items-center mx-2" style={{cursor: 'pointer'}}>
                     <CommentMenu post={post} comment={comment} setOnEdit={setOnEdit} />
-                    <LikeBtn isLike={isLike} setIsLike={setIsLike} />
+                    <LikeBtn isLike={isLike} setLike={setLike} post={post} comment={comment} />
                 </div>
             </div> 
             
-            {/* {
+            {
                 onReply &&
-                <InputComment post={post} onReply={onReply} setOnReply={setOnReply} >
-                    <Link to={`/profile/${onReply.user._id}`} className="mr-1">
-                        @{onReply.user.username}:
-                    </Link>
-                </InputComment>
-            } */}
+                <InputComment post={post} onReply={onReply} setOnReply={setOnReply} />
+            }
 
             {children}
         </div>

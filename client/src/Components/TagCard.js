@@ -9,14 +9,14 @@ const TagCard = ({user, border, data}) => {
     const handleTag = evt => {
         evt.preventDefault();
         
-        if(tagging + kw.length + 1 === content.length)
-            setContent(content.slice(0, tagging + 1) + user.username + ' ');
-        else{
-            setContent(content.slice(0, tagging + 1) + 
-        user.username + ' ' + content.slice(tagging + 1, content.length));
+        // if(tagging + kw.length + 1 === content.length)
+        //     setContent(content.slice(0, tagging + 1) + user.username + ' ');
+        // else{
+        setContent(content.slice(0, tagging + 1) + 
+        user.username + ' ' + content.slice(tagging + kw.length + 1, content.length));
 
-        updateTags(tags, tagging + user.username.length + 2, user.username.length + 1);
-        }
+        updateTags(tags, tagging + user.username.length + 2, user.username.length + 1 - kw.length);
+        
         
         setTags([...tags, {
             start: tagging, 

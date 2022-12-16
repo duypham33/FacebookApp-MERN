@@ -1,18 +1,25 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { LikePost, UnLikePost } from '../redux/actions/postActions';
+import { likeComment, unlikeComment } from '../redux/actions/commentActions';
 
-const LikeBtn = ({isLike, setLike, post}) => {
+const LikeBtn = ({isLike, setLike, post, comment}) => {
     const dispatch = useDispatch();
     const {auth, theme} = useSelector(state => state);
 
     const handleLike = () => {
-        dispatch(LikePost(post, auth));
+        if(!comment)
+            dispatch(LikePost(post, auth));
+        else
+            dispatch(likeComment(post, comment, auth));
         setLike(true);
     }
 
     const handleUnlike = () => {
-        dispatch(UnLikePost(post, auth));
+        if(!comment)
+            dispatch(UnLikePost(post, auth));
+        else
+            dispatch(unlikeComment(post, comment, auth));
         setLike(false);
     }
 

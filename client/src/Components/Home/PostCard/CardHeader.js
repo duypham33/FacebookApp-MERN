@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import GLOBAL_TYPES from '../../../redux/actions/globalTypes';
-// import { deletePost } from '../../../redux/actions/postAction'
-// import { BASE_URL } from '../../../utils/config'
+
 
 const CardHeader = ({post}) => {
     const { auth } = useSelector(state => state);
@@ -15,7 +14,10 @@ const CardHeader = ({post}) => {
     const handleEditPost = () => {
         dispatch({ type: GLOBAL_TYPES.STATUS, payload: {...post, onEdit: true}});
     }
-
+    
+    const handleCopy = () => navigator.clipboard.writeText(
+        `http://localhost:3000/post/${post._id}`
+    );
 
     return (
         <div className="card_header">
@@ -53,7 +55,8 @@ const CardHeader = ({post}) => {
                     }
 
                     <div className="dropdown-item">
-                        <span className="material-icons">content_copy</span> Copy Link
+                        <span className="material-icons"
+                        onClick={handleCopy}>content_copy</span> Copy Link
                     </div>
                 </div>
             </div>

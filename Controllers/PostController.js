@@ -49,6 +49,27 @@ const postCtrl = {
         }
     },
 
+    getPostDetail: async (req, res) => {
+        try{
+            const post = await postModel.findById(req.params.id).
+            populate("author likes", "fullname username avatar").
+            populate({
+                path: "comments",
+                populate: {
+                    path: "author likes",
+                    select: "fullname username avatar"
+                }
+            });
+
+            if(!post)
+                return res.status(404);
+            
+            return res.status(200).send({post: post});
+        } catch(err) {
+            return res.status(500).send({msg: err.message});
+        }
+    },
+
     updatePost: async (req, res) => {
         try {
             const post = await postModel.findByIdAndUpdate(req.params.id, {

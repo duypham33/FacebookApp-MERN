@@ -1,4 +1,5 @@
 const userModel = require('../Models/UserModel');
+const postModel = require('../Models/PostModel');
 
 const userCtrl = {
     search: async (req, res) => {
@@ -22,13 +23,20 @@ const userCtrl = {
             populate("followers following", "_id fullname username avatar");
             if(!user)
                 return res.status(404);
-
-            // const currentUser = await userModel.findById(req.userID);
-            // const targetUser = await userModel.find({
-            //     $and: [{_id: req.params.id}, {_id: {$in: currentUser.followers}}]
-            // });
-            // console.log(targetUser !== null);
-            return res.status(200).send({user: user});
+            
+            const posts = await postModel.find({author: req.params.id}).sort("-updatedAt").
+            populate({
+                path: "comments",
+                populate: {
+                    path: "author likes",
+                    select: "fullname username avatar"
+                }
+            });
+            
+            return res.status(200).send({
+                user: user,
+                posts: posts
+            });
 
         } catch (err) {
             return res.status(500).send({msg: err.message});

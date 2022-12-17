@@ -4,7 +4,8 @@ const initialState = {
     homePosts: [],
     result: 0,
     page: 0,
-    myposts: []
+    myposts: [],
+    postDetail: {}
 };
 
 
@@ -15,10 +16,11 @@ const postReducer = (state = initialState, action) => {
                 homePosts: [action.payload, ...state.homePosts],
                 page: state.page > 0 ? state.page : 2,
                 result: state.result + 1,
-                myposts: [action.payload, ...state.myposts]
+                myposts: [action.payload, ...state.myposts],
+                postDetail: state.postDetail
             }
         case GLOBAL_TYPES.GET_POSTS:
-            return {...action.payload, page: state.page > 0 ? state.page : 2}
+            return {...action.payload, page: state.page > 0 ? state.page : 2, postDetail: state.postDetail}
         case GLOBAL_TYPES.UPDATE_POST:
             return {
                 ...state,
@@ -38,7 +40,8 @@ const postReducer = (state = initialState, action) => {
                 ...state,
                 homePosts: updateOneInPosts(state.homePosts, action.payload.newPost)
             }
-
+        case GLOBAL_TYPES.UPDATE_POST_DETAIL:
+            return {...state, postDetail: action.payload};          
 
         default:
             return state;

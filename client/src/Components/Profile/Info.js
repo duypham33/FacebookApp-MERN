@@ -63,21 +63,6 @@ const Info = ({id, auth, user}) => {
                     setShowFollow={setShowFollow} 
                     />
                 }
-
-                {/* {
-                    showFollowers &&
-                    <Followers 
-                    users={user.followers} 
-                    setShowFollowers={setShowFollowers} 
-                    />
-                }
-                {
-                    showFollowing &&
-                    <Following 
-                    users={user.following} 
-                    setShowFollowing={setShowFollowing} 
-                    />
-                } */}
             </div>
         </div>
     )

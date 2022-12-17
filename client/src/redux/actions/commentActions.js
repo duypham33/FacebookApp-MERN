@@ -5,6 +5,11 @@ import { logout } from './authActions';
 
 export const createComment = (newComment, post, auth) => async dispatch => {
     const newPost = {...post, comments: [...post.comments, newComment]};
+
+    dispatch({
+        type: GLOBAL_TYPES.UPDATE_POST_DETAIL,
+        payload: newPost
+    });
     dispatch({type: GLOBAL_TYPES.UPDATE_POST_INORDER, payload: {
         newPost: newPost, 
         isMyPost: post.author._id === auth.user._id
@@ -14,6 +19,12 @@ export const createComment = (newComment, post, auth) => async dispatch => {
         newComment: newComment
     }).then(res => {
         newComment._id = res.data.commentID;
+        
+        dispatch({
+            type: GLOBAL_TYPES.UPDATE_POST_DETAIL,
+            payload: newPost
+        });
+
         dispatch({type: GLOBAL_TYPES.UPDATE_POST_INORDER, payload: {
             newPost: newPost, 
             isMyPost: post.author._id === auth.user._id
@@ -31,6 +42,11 @@ export const updateComment = (comment, post, content, auth) => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
 
     comment.content = content;
+    dispatch({
+        type: GLOBAL_TYPES.UPDATE_POST_DETAIL,
+        payload: post
+    });
+
     dispatch({type: GLOBAL_TYPES.UPDATE_POST_INORDER, payload: {
         newPost: post, 
         isMyPost: post.author._id === auth.user._id
@@ -53,6 +69,10 @@ export const likeComment = (post, comment, auth) => dispatch => {
     
     //const cm = post.comments.find(c => c._id === comment._id);
     comment.likes.push(auth.user);
+    dispatch({
+        type: GLOBAL_TYPES.UPDATE_POST_DETAIL,
+        payload: post
+    });
     dispatch({type: GLOBAL_TYPES.UPDATE_POST_INORDER, payload: {
         newPost: post, 
         isMyPost: post.author._id === auth.user._id
@@ -75,6 +95,10 @@ export const unlikeComment = (post, comment, auth) => dispatch => {
     
     //const cm = post.comments.find(c => c._id === comment._id);
     comment.likes = comment.likes.filter(user => user._id !== auth.user._id);
+    dispatch({
+        type: GLOBAL_TYPES.UPDATE_POST_DETAIL,
+        payload: post
+    });
     dispatch({type: GLOBAL_TYPES.UPDATE_POST_INORDER, payload: {
         newPost: post, 
         isMyPost: post.author._id === auth.user._id

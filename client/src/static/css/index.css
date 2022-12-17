@@ -63,6 +63,8 @@ img {
 /* -------- Comments ---------- */
 @import url("./comments.css");
 
+/* -------- Post Thumb ---------- */
+@import url("./post_thumb.css");
 
 
 /* --------- Responsive ------ */

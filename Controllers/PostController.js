@@ -6,10 +6,20 @@ const userModel = require('../Models/UserModel');
 const postCtrl = {
     createPost: async (req, res) => {
         try {
-            const newPost = await postModel.create({
+            const post = await postModel.create({
                 author: req.userID,
                 content: req.body.content,
                 images: req.body.images
+            });
+
+            const newPost = await postModel.findById(post._id).
+            populate("author likes", "fullname username avatar followers").
+            populate({
+                path: "comments",
+                populate: {
+                    path: "author likes",
+                    select: "fullname username avatar"
+                }
             });
             
             return res.status(200).send({
@@ -29,7 +39,7 @@ const postCtrl = {
             
             const user = await userModel.findById(req.userID);
             const homePosts = await postModel.find({author: {$in: [...user.following, user._id]}}).
-            sort("-updatedAt").populate("author likes", "fullname username avatar").
+            sort("-updatedAt").populate("author likes", "fullname username avatar followers").
             populate({
                 path: "comments",
                 populate: {
@@ -52,7 +62,7 @@ const postCtrl = {
     getPostDetail: async (req, res) => {
         try{
             const post = await postModel.findById(req.params.id).
-            populate("author likes", "fullname username avatar").
+            populate("author likes", "fullname username avatar followers").
             populate({
                 path: "comments",
                 populate: {
@@ -75,7 +85,7 @@ const postCtrl = {
             const post = await postModel.findByIdAndUpdate(req.params.id, {
                 content: req.body.content,
                 images: req.body.images
-            }, {new: true}).populate("author likes", "fullname username avatar").
+            }, {new: true}).populate("author likes", "fullname username avatar followers").
             populate({
                 path: "comments",
                 populate: {

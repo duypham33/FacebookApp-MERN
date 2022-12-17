@@ -3,9 +3,6 @@ import { Link } from 'react-router-dom';
 import Send from '../../../static/images/send.svg';
 import LikeBtn from '../../LikeBtn';
 import { useSelector, useDispatch } from 'react-redux';
-//import { likePost, unLikePost, savePost, unSavePost } from '../../../redux/actions/postAction'
-//import ShareModal from '../../ShareModal'
-//import { BASE_URL } from '../../../utils/config'
 
 
 const CardFooter = ({post}) => {

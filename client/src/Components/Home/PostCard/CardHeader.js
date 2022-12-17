@@ -48,9 +48,6 @@ const CardHeader = ({post}) => {
                             <div className="dropdown-item" onClick={handleEditPost}>
                                 <span className="material-icons">create</span> Edit Post
                             </div>
-                            <div className="dropdown-item">
-                                <span className="material-icons">delete_outline</span> Remove Post
-                            </div>
                         </>
                     }
 

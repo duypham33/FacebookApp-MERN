@@ -134,6 +134,23 @@ const userCtrl = {
             return res.status(500).send({msg: err.message});
         }
     },
+
+    getSuggestions: async (req, res) => {
+        try {
+            const user = await userModel.findById(req.userID);
+            const ids = [...user.following, user._id];
+            const users = await userModel.aggregate([
+                {$match: {_id: {$nin: ids}}},
+                {$sample: {size: 10}},
+                { $lookup: { from: 'user', localField: 'followers', foreignField: '_id', as: 'followers' } },
+                { $lookup: { from: 'user', localField: 'following', foreignField: '_id', as: 'following' } },
+            ]).project("_id fullname username avatar");
+            //console.log(users);
+            return res.status(200).send({users: users});
+        } catch (err) {
+            return res.status(500).send({msg: err.message});
+        }
+    }
 }
 
 module.exports = userCtrl;

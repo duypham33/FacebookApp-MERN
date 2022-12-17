@@ -1,11 +1,12 @@
 import {useEffect, useState} from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 //import { follow, unfollow } from '../redux/actions/profileActions';
 import GLOBAL_TYPES from '../redux/actions/globalTypes';
 import axios from 'axios';
 
 const FollowBtn = ({user, auth}) => {
     const [followed, setFollowed] = useState(false); 
+    const {socket} = useSelector(state => state);
     const dispatch = useDispatch();
     
     useEffect(() => {
@@ -20,6 +21,10 @@ const FollowBtn = ({user, auth}) => {
         setFollowed(!followed);
         axios.patch(`api/users/${auth.user._id}/follow`, {targetID: user._id}).then(res => {
             dispatch({type: GLOBAL_TYPES.LOGIN, payload: {user: res.data.user}});
+
+            socket.emit("follow", {sender: auth.user, 
+                receiverId: user._id, 
+                action: "followed"});
         });
     }
 
@@ -27,6 +32,10 @@ const FollowBtn = ({user, auth}) => {
         setFollowed(!followed);
         axios.patch(`api/users/${auth.user._id}/unfollow`, {targetID: user._id}).then(res => {
             dispatch({type: GLOBAL_TYPES.LOGIN, payload: {user: res.data.user}});
+
+            socket.emit("follow", {sender: auth.user, 
+                receiverId: user._id, 
+                action: "unfollowed"});
         })
     }
 

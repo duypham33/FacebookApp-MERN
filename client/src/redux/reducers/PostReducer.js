@@ -24,8 +24,9 @@ const postReducer = (state = initialState, action) => {
         case GLOBAL_TYPES.UPDATE_POST:
             return {
                 ...state,
-                homePosts: updateOneInPostsMoveToHead(state.homePosts, action.payload),
-                myposts: updateOneInPostsMoveToHead(state.myposts, action.payload)
+                homePosts: updateOneInPostsMoveToHead(state.homePosts, action.payload.newPost),
+                myposts: !action.payload.isMyPost ? state.myposts :
+                updateOneInPostsMoveToHead(state.myposts, action.payload.newPost)
             }
         case GLOBAL_TYPES.RESET_POSTS:
             return initialState;

@@ -21,7 +21,7 @@ export const getPosts = () => dispatch => {
 
 
 
-export const createPost = ({content, images, auth}) => async dispatch => {
+export const createPost = ({content, images, auth, socket}) => async dispatch => {
     let media = [];
     try {
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
@@ -37,6 +37,11 @@ export const createPost = ({content, images, auth}) => async dispatch => {
             type: GLOBAL_TYPES.CREATE_POST, 
             payload: {...res.data.newPost, author: auth.user }
         })
+
+        socket.emit("updatePosts", {
+            newPost: res.data.newPost,
+            action: "created"
+        });
 
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {success: res.data.msg} });
 
@@ -54,7 +59,7 @@ export const createPost = ({content, images, auth}) => async dispatch => {
 
 
 
-export const updatePost = ({content, images, auth, status}) => async dispatch => {
+export const updatePost = ({content, images, auth, status, socket}) => async dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
     let media = [];
     const imgNewUrl = images.filter(img => !img.url);
@@ -78,8 +83,17 @@ export const updatePost = ({content, images, auth, status}) => async dispatch =>
             type: GLOBAL_TYPES.UPDATE_POST_DETAIL,
             payload: res.data.updatedPost
         });
-        dispatch({ type: GLOBAL_TYPES.UPDATE_POST, payload: res.data.updatedPost });
+        dispatch({ type: GLOBAL_TYPES.UPDATE_POST, 
+            payload: {
+                newPost: res.data.updatedPost, 
+                isMyPost: true
+        }});
 
+        socket.emit("updatePosts", {
+            newPost: res.data.updatedPost,
+            action: "updated"
+        });
+            
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {success: res.data.msg} });
     } catch (err) {
         if(err.response.status === 401)
@@ -94,7 +108,7 @@ export const updatePost = ({content, images, auth, status}) => async dispatch =>
 }
 
 
-export const LikePost = (post, auth) => dispatch => {
+export const LikePost = (post, auth, socket) => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
     const newPost = {...post, likes: [...post.likes, auth.user]};
     dispatch({
@@ -109,7 +123,13 @@ export const LikePost = (post, auth) => dispatch => {
 
     axios.patch(`api/posts/${post._id}/like`).then(res => {
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: false} });
-
+        socket.emit("likeUnlike", {
+            newPost: newPost, 
+            user: {_id: auth.user._id, username: auth.user.username},
+            action: "liked",
+            type: "post"
+        });
+        
     }).catch(err => {
         if(err.response.status === 401)
             dispatch(logout("Your session expired! Please, login again!"));
@@ -119,7 +139,7 @@ export const LikePost = (post, auth) => dispatch => {
 }
 
 
-export const UnLikePost = (post, auth) => dispatch => {
+export const UnLikePost = (post, auth, socket) => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
     const newPost = {...post, likes: post.likes.filter(user => user._id !== auth.user._id)};
     
@@ -133,6 +153,13 @@ export const UnLikePost = (post, auth) => dispatch => {
     }});
 
     axios.patch(`api/posts/${post._id}/unlike`).then(res => {
+
+        socket.emit("likeUnlike", {
+            newPost: newPost, 
+            user: {_id: auth.user._id, username: auth.user.username},
+            action: "unliked",
+            type: "post"
+        });
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: false} });
 
     }).catch(err => {

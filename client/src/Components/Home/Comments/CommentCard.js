@@ -11,7 +11,7 @@ import InputComment from '../InputComment';
 
 
 const CommentCard = ({children, comment, post}) => {
-    const { auth, theme } = useSelector(state => state);
+    const { auth, theme, socket } = useSelector(state => state);
     const dispatch = useDispatch();
 
     const [content, setContent] = useState('');
@@ -35,7 +35,7 @@ const CommentCard = ({children, comment, post}) => {
 
     const handleUpdate = () => {
         if(comment.content !== content)
-            dispatch(updateComment(comment, post, content, auth));
+            dispatch(updateComment(comment, post, content, auth, socket));
         
         setOnEdit(false);
     }
@@ -52,9 +52,6 @@ const CommentCard = ({children, comment, post}) => {
         opacity: comment._id ? 1 : 0.5,
         pointerEvents: comment._id ? 'inherit' : 'none'
     }
-
-    // const l = `<Link to={\`/profile/${comment.author._id}\`} className="d-flex text-dark">
-    // @${comment.author.username} </Link> Hello everyone`;
 
     return (
         <div className="comment_card mt-2" style={styleCard}>

@@ -6,7 +6,7 @@ import { createPost, updatePost } from '../redux/actions/postActions';
 //import { imageShow, videoShow } from '../utils/mediaShow';
 
 const StatusModal = () => {
-    const { auth, theme, status } = useSelector(state => state);
+    const { auth, theme, status, socket } = useSelector(state => state);
     const dispatch = useDispatch();
 
     const [content, setContent] = useState('');
@@ -87,9 +87,9 @@ const StatusModal = () => {
         }
 
         if(status.onEdit === true)
-            dispatch(updatePost({content, images, auth, status}));
+            dispatch(updatePost({content, images, auth, status, socket}));
         else
-            dispatch(createPost({content, images, auth}));
+            dispatch(createPost({content, images, auth, socket}));
 
         setContent('');
         setImages([]);

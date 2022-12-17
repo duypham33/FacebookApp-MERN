@@ -3,7 +3,7 @@ import GLOBAL_TYPES from './globalTypes';
 import { logout } from './authActions';
 
 
-export const createComment = (newComment, post, auth) => async dispatch => {
+export const createComment = (newComment, post, auth, socket) => async dispatch => {
     const newPost = {...post, comments: [...post.comments, newComment]};
 
     dispatch({
@@ -29,6 +29,12 @@ export const createComment = (newComment, post, auth) => async dispatch => {
             newPost: newPost, 
             isMyPost: post.author._id === auth.user._id
         }});
+
+        socket.emit("updateComments", {
+            newPost: newPost,
+            newComment: newComment,
+            action: "created"
+        });
         
     }).catch(err => {
         if(err.response.status === 401)
@@ -38,7 +44,7 @@ export const createComment = (newComment, post, auth) => async dispatch => {
     });
 }
 
-export const updateComment = (comment, post, content, auth) => dispatch => {
+export const updateComment = (comment, post, content, auth, socket) => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
 
     comment.content = content;
@@ -54,6 +60,12 @@ export const updateComment = (comment, post, content, auth) => dispatch => {
 
     axios.patch(`api/comments/${comment._id}/update`, {content: content}).then(res => {
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {success: res.data.msg} });
+        
+        socket.emit("updateComments", {
+            newPost: post,
+            newComment: comment,
+            action: "updated"
+        });
 
     }).catch(err => {
         if(err.response.status === 401)
@@ -64,10 +76,9 @@ export const updateComment = (comment, post, content, auth) => dispatch => {
 }
 
 
-export const likeComment = (post, comment, auth) => dispatch => {
+export const likeComment = (post, comment, auth, socket) => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
     
-    //const cm = post.comments.find(c => c._id === comment._id);
     comment.likes.push(auth.user);
     dispatch({
         type: GLOBAL_TYPES.UPDATE_POST_DETAIL,
@@ -80,7 +91,13 @@ export const likeComment = (post, comment, auth) => dispatch => {
 
     axios.patch(`api/comments/${comment._id}/like`).then(res => {
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: false} });
-
+        socket.emit("likeUnlike", {
+            newPost: post, 
+            user: {_id: auth.user._id, username: auth.user.username},
+            action: "liked",
+            type: "comment",
+            commenterId: comment.author._id
+        });
     }).catch(err => {
         if(err.response.status === 401)
             dispatch(logout("Your session expired! Please, login again!"));
@@ -90,7 +107,7 @@ export const likeComment = (post, comment, auth) => dispatch => {
 }
 
 
-export const unlikeComment = (post, comment, auth) => dispatch => {
+export const unlikeComment = (post, comment, auth, socket) => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
     
     //const cm = post.comments.find(c => c._id === comment._id);
@@ -106,7 +123,12 @@ export const unlikeComment = (post, comment, auth) => dispatch => {
 
     axios.patch(`api/comments/${comment._id}/unlike`).then(res => {
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: false} });
-
+        socket.emit("likeUnlike", {
+            newPost: post, 
+            user: {_id: auth.user._id, username: auth.user.username},
+            action: "unliked",
+            type: "comment"
+        });
     }).catch(err => {
         if(err.response.status === 401)
             dispatch(logout("Your session expired! Please, login again!"));

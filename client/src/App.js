@@ -5,20 +5,22 @@ import PageRender from './PageRender';
 import Login from './pages/login';
 import Home from './pages/home';
 import Notify from './Components/Notify/Notify';
-//import axios from 'axios';
-//import GLOBAL_TYPES from './redux/actions/globalTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMe } from './redux/actions/authActions';
 import Header from './Components/Header/Header';
 import StatusModal from './Components/StatusModal';
 import {getPosts} from './redux/actions/postActions';
+import { getSuggestions } from './redux/actions/suggestionsActions';
+import io from 'socket.io-client';
+import GLOBAL_TYPES from './redux/actions/globalTypes';
+import SocketClient from './SocketClient';
 
 export const inverterContext = createContext();
 
 function App() {
   
   const dispatch = useDispatch();
-  const {auth, status} = useSelector(state => state);
+  const {auth, status, socket} = useSelector(state => state);
   const [inverter, setInverter] = useState(0);
   
   //Authen
@@ -28,10 +30,17 @@ function App() {
     
   }, []);
 
-  //Get Posts
+  //Get Posts, Suggestions
   useEffect(() => {
-    if(auth.user)
+    if(auth.user){
       dispatch(getPosts());
+      dispatch(getSuggestions(auth));
+      
+      const socketio = io.connect("http://localhost:5000");
+      dispatch({type: GLOBAL_TYPES.SOCKET, payload: socketio});
+
+      return () => socketio.close();
+    }
 
   }, [auth.user]);
 
@@ -46,6 +55,7 @@ function App() {
           <div className="main">
             {auth.user && <Header />}
             {(status.onCreate || status.onEdit) && <StatusModal />}
+            {(auth.user && socket) && <SocketClient />}
 
             <Routes>
               <Route exact path="/" element={auth.user ? <Home /> : <Login />} />

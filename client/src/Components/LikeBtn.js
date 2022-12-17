@@ -5,21 +5,21 @@ import { likeComment, unlikeComment } from '../redux/actions/commentActions';
 
 const LikeBtn = ({isLike, setLike, post, comment}) => {
     const dispatch = useDispatch();
-    const {auth, theme} = useSelector(state => state);
+    const {auth, theme, socket} = useSelector(state => state);
 
     const handleLike = () => {
         if(!comment)
-            dispatch(LikePost(post, auth));
+            dispatch(LikePost(post, auth, socket));
         else
-            dispatch(likeComment(post, comment, auth));
+            dispatch(likeComment(post, comment, auth, socket));
         setLike(true);
     }
 
     const handleUnlike = () => {
         if(!comment)
-            dispatch(UnLikePost(post, auth));
+            dispatch(UnLikePost(post, auth, socket));
         else
-            dispatch(unlikeComment(post, comment, auth));
+            dispatch(unlikeComment(post, comment, auth, socket));
         setLike(false);
     }
 

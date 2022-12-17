@@ -11,7 +11,7 @@ const InputComment = ({post, onReply, setOnReply}) => {
     const [users, setUsers] = useState([]);
     const [tags, setTags] = useState([]);
 
-    const { auth, theme } = useSelector(state => state);
+    const { auth, theme, socket } = useSelector(state => state);
     const dispatch = useDispatch();
     const handleComment = e => {
         handleInput({e, content, setContent, tagging, setTagging, kw,
@@ -34,7 +34,7 @@ const InputComment = ({post, onReply, setOnReply}) => {
             reply: onReply ? (onReply.reply ? onReply.reply : onReply._id) : null
         }
         
-        dispatch(createComment(newComment, post, auth));
+        dispatch(createComment(newComment, post, auth, socket));
         setContent('');
         setTagging(null);
         setKw('');

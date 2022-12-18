@@ -5,6 +5,7 @@ import { logout } from '../../redux/actions/authActions';
 import GLOBAL_TYPES from '../../redux/actions/globalTypes';
 import Avatar from '../Avatar';
 import { inverterContext } from '../../App';
+import NoticesModal from '../NoticesModal';
 
 const Menu = () => {
     const navLinks = [
@@ -12,7 +13,7 @@ const Menu = () => {
         { label: 'Message', icon: 'near_me', path: '/message'},
     ]
 
-    const { auth, theme } = useSelector(state => state);
+    const { auth, theme, notices } = useSelector(state => state);
     const dispatch = useDispatch();
     const { pathname } = useLocation();
     const {inverter, setInverter} = useContext(inverterContext);
@@ -38,24 +39,24 @@ const Menu = () => {
                     <span className="nav-link position-relative" id="navbarDropdown" 
                     role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 
-                        {/* <span className="material-icons" 
-                        style={{color: notify.data.length > 0 ? 'crimson' : ''}}>
+                        <span className="material-icons" 
+                        style={{color: notices.data.length > 0 ? 'crimson' : ''}}>
                             favorite
                         </span>
 
-                        <span className="notify_length">{notify.data.length}</span> */}
+                        <span className="notify_length">{notices.data.length}</span>
 
                     </span>
 
-                    {/* <div className="dropdown-menu" aria-labelledby="navbarDropdown"
+                    <div className="dropdown-menu" aria-labelledby="navbarDropdown"
                     style={{transform: 'translateX(75px)'}}>
-                        <NotifyModal />
-                    </div> */}
+                        <NoticesModal />
+                    </div>
                         
                 </li>
            
             
-                <li className="nav-item dropdown" style={{opacity: 1}} >
+                <li className="nav-item dropdown" style={{opacity: 1, marginLeft: 15}} >
                     <span className="nav-link dropdown-toggle" id="navbarDropdown" 
                     role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <Avatar src={auth.user.avatar} size="medium-avatar" />

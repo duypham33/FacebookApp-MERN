@@ -3,12 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import GLOBAL_TYPES from "./redux/actions/globalTypes";
 
 const SocketClient = () => {
-    const {auth, socket} = useSelector(state => state);
+    const {auth, socket, online} = useSelector(state => state);
     const dispatch = useDispatch();
 
     //Connect
     useEffect(() => {
-        socket.emit('joinUser', auth.user._id);
+        socket.emit('joinUser', auth.user);
 
     }, [auth, socket]);
 
@@ -96,6 +96,79 @@ const SocketClient = () => {
         return () => socket.off("followUnfollowToClient");
     }, [socket]);
 
+
+
+    //Notice
+    useEffect(() => {
+        socket.on('noticeToClient', notice => {
+            console.log(notice);
+            dispatch({type: GLOBAL_TYPES.CREATE_NOTICE, payload: notice});
+        });
+
+        return () => socket.off('noticeToClient');
+    }, [socket]);
+
+
+    //Message
+    useEffect(() => {
+        socket.on('messageToClient', data => {
+            console.log(data);
+            dispatch({type: GLOBAL_TYPES.ADD_MESSAGE, payload: data});
+        });
+
+        return () => socket.off('messageToClient');
+    }, [socket]);
+
+
+    //Delete a message
+    useEffect(() => {
+        socket.on('deleteMessageToClient', data => {
+            console.log(data);
+            dispatch({type: GLOBAL_TYPES.DELETE_MESSAGE, payload: data});
+        });
+
+        return () => socket.off('deleteMessageToClient');
+    }, [socket]);
+
+
+    //Check online offline status
+    useEffect(() => {
+        socket.emit('checkOnline', auth.user);
+
+    }, [socket, auth]);
+    
+    
+    useEffect(() => {
+        socket.on('checkOnlineToMe', onlines => {
+            console.log('checkOnlineToMe', onlines);
+            
+            onlines.map(user => dispatch({type: GLOBAL_TYPES.ONLINE, payload: user._id}));
+        });
+
+        return () => socket.off('checkOnlineToMe');
+    }, [socket, auth]);
+
+
+
+    useEffect(() => {
+        socket.on('checkOnlineToClient', userId => {
+            dispatch({type: GLOBAL_TYPES.ONLINE, payload: userId});
+
+        });
+
+        return () => socket.off('checkOnlineToClient');
+    }, [socket, auth]);
+
+
+
+    useEffect(() => {
+        socket.on('checkOffOnlineToClient', userId => {
+            dispatch({type: GLOBAL_TYPES.OFFLINE, payload: userId});
+            
+        });
+
+        return () => socket.off('checkOffOnlineToClient');
+    }, [socket, auth]);
 
 
     return <> </>;

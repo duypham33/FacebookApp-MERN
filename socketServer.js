@@ -1,38 +1,46 @@
 
-let consumers = [];
+let consumersMap = {};
 
 const SocketServer = socket => {
     //Connect
-    socket.on('joinUser', id => {
-        const consumer = consumers.find(consumer => consumer.userId === id);
-        if(consumer)
-            consumer.socketId = socket.id;
-        else
-            consumers.push({userId: id, socketId: socket.id});
-        
-        //console.log(consumers);
+    socket.on('joinUser', user => {
+        const {_id, followers} = user;
+        consumersMap[_id] = {followers: followers, socketId: socket.id};
     });
 
     //Disconnect
     socket.on('disconnect', () => {
-        consumers = consumers.filter(consumer => consumer.socketId !== socket.id);
+        for(const [userId, value] of Object.entries(consumersMap)){
+            if(value && value.socketId === socket.id){
+                //Inform the followers know the user was offline
+                const followers = value.followers;
+                if(followers.length > 0){
+                    followers.forEach(u => {
+                        console.log(u);
+                        if(consumersMap[u._id])
+                            socket.to(`${consumersMap[u._id].socketId}`).
+                            emit('checkOffOnlineToClient', userId);
+                    })
+                }
+                
+                consumersMap[userId] = null;
+                break;
+            }
+        }
+        
+        //console.log(consumersMap);
     })
 
     //Like-Unlike posts/comments
     socket.on('likeUnlike', data => {
-        //console.log(data)
-        //console.log(consumers);
         const author = data.newPost.author;
         const userId = data.user._id;
         const receiversId = [...author.followers, author._id];
-        const receivers = consumers.filter(consumer => 
-            consumer.userId !== userId && receiversId.includes(consumer.userId));
-        //console.log(receiversId);
-        //console.log(receivers);
-
-        if(receivers.length > 0)
-            receivers.forEach(receiver => 
-                socket.to(`${receiver.socketId}`).emit('likeUnlikeToClient', data));
+        
+        receiversId.forEach(id => {
+            if(id !== userId && consumersMap[id])
+                socket.to(`${consumersMap[id].socketId}`).emit('likeUnlikeToClient', data);
+        });
     })
     
     //Create/Update a post
@@ -41,38 +49,68 @@ const SocketServer = socket => {
         const author = data.newPost.author;
         const userId = author._id;
         const receiversId = author.followers;
-        const receivers = consumers.filter(consumer => 
-            consumer.userId !== userId && receiversId.includes(consumer.userId));
-        //console.log(receiversId);
-
-        if(receivers.length > 0)
-            receivers.forEach(receiver => 
-                socket.to(`${receiver.socketId}`).emit('updatePostsToClient', data));
+        
+        receiversId.forEach(id => {
+            if(id !== userId && consumersMap[id])
+                socket.to(`${consumersMap[id].socketId}`).emit('updatePostsToClient', data);
+        });
     })
 
 
     //Create/Update a comment
     socket.on('updateComments', data => {
-        //console.log(data)
         const postAuthor = data.newPost.author;
         const userId = data.newComment.author._id;
         const receiversId = [...postAuthor.followers, postAuthor._id];
         
-        const receivers = consumers.filter(consumer => 
-            consumer.userId !== userId && receiversId.includes(consumer.userId));
-        //console.log(receiversId);
-
-        if(receivers.length > 0)
-            receivers.forEach(receiver => 
-                socket.to(`${receiver.socketId}`).emit('updateCommentsToClient', data));
+        receiversId.forEach(id => {
+            if(id !== userId && consumersMap[id])
+                socket.to(`${consumersMap[id].socketId}`).emit('updateCommentsToClient', data);
+        });
     })
 
     //Follow/Unfollow
     socket.on('follow', data => {
         const {receiverId} = data;
-        const receiver = consumers.find(consumer => consumer.userId === receiverId);
-        if(receiver)
-            socket.to(`${receiver.socketId}`).emit('followUnfollowToClient', data);
+        if(consumersMap[receiverId])
+            socket.to(`${consumersMap[receiverId].socketId}`).emit('followUnfollowToClient', data);
+    })
+
+    //Notice
+    socket.on('onNotice', notice => {
+        notice.recipients.forEach(id => {
+            if(consumersMap[id])
+                socket.to(`${consumersMap[id].socketId}`).emit('noticeToClient', notice);
+        });
+    })
+
+    //Messages
+    socket.on('onMessage', ({peer, msg, receiverId}) => {
+        if(consumersMap[receiverId])
+            socket.to(`${consumersMap[receiverId].socketId}`).emit('messageToClient', {peer, msg});
+    })
+
+    //Delete a message
+    socket.on('deleteMessage', ({data, receiverId}) => {
+        if(consumersMap[receiverId])
+            socket.to(`${consumersMap[receiverId].socketId}`).emit('deleteMessageToClient', data);
+    })
+
+    //Check online
+    socket.on('checkOnline', user => {
+        const {following, followers} = user;
+        //First, get online users from following
+        const onlines = following.filter(u => consumersMap[u._id]);
+        socket.emit("checkOnlineToMe", onlines);
+        
+        //Then, inform for followers know the user is online
+        if(followers.length > 0){
+            followers.forEach(u => {
+                if(consumersMap[u._id])
+                    socket.to(`${consumersMap[u._id].socketId}`).emit('checkOnlineToClient', user._id);
+            })
+        }
+        
     })
 }
 

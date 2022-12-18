@@ -45,7 +45,7 @@ app.use('/api/users', require('./Routes/UserRouter'));
 app.use('/api/posts', require('./Routes/PostRouter'));
 app.use('/api/comments', require('./Routes/CommentRouter'));
 app.use('/api/notify', require('./Routes/NotifyRouter'));
-
+app.use('/api/messages', require('./Routes/MessageRouter'));
 
 http.listen(process.env.PORT, () => {
     console.log('Server is running on port', process.env.PORT);

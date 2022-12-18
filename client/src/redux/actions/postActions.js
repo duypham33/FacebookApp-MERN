@@ -2,7 +2,7 @@ import axios from 'axios';
 import GLOBAL_TYPES from './globalTypes';
 import { imageUpload } from '../../utils/imageUpload';
 import { logout } from './authActions';
-
+import {createNotify} from './noticeActions';
 
 export const getPosts = () => dispatch => {
     dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {loading: true} });
@@ -37,14 +37,26 @@ export const createPost = ({content, images, auth, socket}) => async dispatch =>
             type: GLOBAL_TYPES.CREATE_POST, 
             payload: {...res.data.newPost, author: auth.user }
         })
-
+        
+        //res.data.newPost.author = auth.user;
         socket.emit("updatePosts", {
             newPost: res.data.newPost,
             action: "created"
         });
 
         dispatch({ type: GLOBAL_TYPES.NOTIFY, payload: {success: res.data.msg} });
-
+        
+        //Notify
+        const notify = {
+            postId: res.data.newPost._id,
+            text: "added a new post!",
+            recipients: auth.user.followers,
+            url: `post/${res.data.newPost._id}`,
+            content: content,
+            image: media[0].url
+        }
+        dispatch(createNotify(notify, auth, socket));
+        
     } catch (err) {
         if(err.response.status === 401)
             dispatch(logout("Your session expired! Please, login again!"));

@@ -11,6 +11,7 @@ import Header from './Components/Header/Header';
 import StatusModal from './Components/StatusModal';
 import {getPosts} from './redux/actions/postActions';
 import { getSuggestions } from './redux/actions/suggestionsActions';
+import { getNotify } from './redux/actions/noticeActions';
 import io from 'socket.io-client';
 import GLOBAL_TYPES from './redux/actions/globalTypes';
 import SocketClient from './SocketClient';
@@ -35,6 +36,7 @@ function App() {
     if(auth.user){
       dispatch(getPosts());
       dispatch(getSuggestions(auth));
+      dispatch(getNotify());
       
       const socketio = io.connect("http://localhost:5000");
       dispatch({type: GLOBAL_TYPES.SOCKET, payload: socketio});

@@ -133,5 +133,6 @@ export const logout = (msg) => dispatch => {
         });
 
         dispatch({type: GLOBAL_TYPES.RESET_POSTS, payload: null});
+        dispatch({type: GLOBAL_TYPES.RESET_MESSENGER, payload: null});
     }, 1500)
 }

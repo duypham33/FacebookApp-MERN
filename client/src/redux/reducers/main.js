@@ -6,6 +6,9 @@ import statusReducer from './StatusReducer';
 import postReducer from './PostReducer';
 import suggestionReducer from "./SuggestionsReducer";
 import socketReducer from "./SocketReducer";
+import noticeReducer from './NoticeReducer';
+import messengerReducer from "./MessengerReducer";
+import onlineReducer from "./OnlineReducer";
 
 export default combineReducers({
     auth: authReducer, 
@@ -14,5 +17,8 @@ export default combineReducers({
     status: statusReducer,
     post: postReducer,
     suggestions: suggestionReducer,
-    socket: socketReducer
+    socket: socketReducer,
+    notices: noticeReducer,
+    message: messengerReducer,
+    online: onlineReducer
 });

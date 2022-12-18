@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import GLOBAL_TYPES from '../redux/actions/globalTypes';
 import { createPost, updatePost } from '../redux/actions/postActions';
-//import Icons from './Icons';
-//import { imageShow, videoShow } from '../utils/mediaShow';
+import Icons from './Icons';
+import { imageShow, videoShow } from '../utils/mediaShow';
 
 const StatusModal = () => {
     const { auth, theme, status, socket } = useSelector(state => state);
@@ -130,12 +130,12 @@ const StatusModal = () => {
                         background: theme ? 'rgba(0,0,0,.03)' : '',
                     }} />
 
-                    {/* <div className="d-flex">
+                    <div className="d-flex">
                         <div className="flex-fill"></div>
                         <Icons setContent={setContent} content={content} theme={theme} />
-                    </div> */}
+                    </div>
 
-                    {/* <div className="show_images">
+                    <div className="show_images">
                         {
                             images.map((img, index) => (
                                 <div key={index} id="file_img">
@@ -161,25 +161,8 @@ const StatusModal = () => {
                                 </div>
                             ))
                         }
-                    </div> */}
-                    <div className="show_images">
-                        {
-                            images.map((img, index) => (
-                                <div key={index} id="file_img">
-                                    <img src={
-                                        img.camera 
-                                        ? 
-                                        img.camera 
-                                        : (img.url ? img.url : URL.createObjectURL(img))
-                                    } 
-                                    alt="image" className="img-thumbnail"
-                                    style={{filter: theme ? 'invert(1)' : 'invert(0)'}} />
-                                    <span onClick={() => deleteImages(index)}>&times;</span>
-                                </div>
-                            ))
-                        }
                     </div>
-
+                    
                     {
                         stream && 
                         <div className="stream position-relative">

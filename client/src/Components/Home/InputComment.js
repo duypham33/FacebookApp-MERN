@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { createComment } from '../../redux/actions/commentActions';
 import TagCard from '../TagCard';
 import {handleInput} from '../../utils/handleTagUsers';
+import Icons from '../Icons';
 
 const InputComment = ({post, onReply, setOnReply}) => {
     const [content, setContent] = useState('');
@@ -52,6 +53,8 @@ const InputComment = ({post, onReply, setOnReply}) => {
                 color: theme ? 'white' : '#111',
                 background: theme ? 'rgba(0,0,0,.03)' : '',
             }} />
+
+            <Icons setContent={setContent} content={content} theme={theme} />
 
             <button type="submit" className="postBtn">
                 Post

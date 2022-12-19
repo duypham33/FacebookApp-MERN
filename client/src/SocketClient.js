@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import GLOBAL_TYPES from "./redux/actions/globalTypes";
 
 const SocketClient = () => {
-    const {auth, socket, online} = useSelector(state => state);
+    const {auth, socket, online, call} = useSelector(state => state);
     const dispatch = useDispatch();
 
     //Connect
@@ -170,6 +170,29 @@ const SocketClient = () => {
         return () => socket.off('checkOffOnlineToClient');
     }, [socket, auth]);
 
+
+
+    //Call
+    useEffect(() => {
+        socket.on("busyToMe", () => {
+            setTimeout(() => {
+                dispatch({type: GLOBAL_TYPES.CALL, payload: null});
+
+                dispatch({type: GLOBAL_TYPES.NOTIFY, 
+                payload: {error: `${call.username} is busy!`}});
+            }, 2500);
+        });
+
+        return () => socket.off('busyToMe');
+    }, [socket, call]);
+
+    useEffect(() => {
+        socket.on("callToClient", data => {
+            dispatch({type: GLOBAL_TYPES.CALL, payload: data});
+        });
+
+        return () => socket.off('callToClient');
+    }, [socket, call]);
 
     return <> </>;
 }

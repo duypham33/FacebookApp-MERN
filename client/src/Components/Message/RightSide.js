@@ -11,7 +11,7 @@ import LoadIcon from '../../static/images/loading.gif';
 import { addMessage, getMessages } from '../../redux/actions/messageActions';
 
 const RightSide = () => {
-    const { auth, message, theme, socket } = useSelector(state => state);
+    const { auth, message, theme, socket, peer } = useSelector(state => state);
     const dispatch = useDispatch();
 
     const { id } = useParams();
@@ -139,47 +139,45 @@ const RightSide = () => {
     //     // eslint-disable-next-line
     // }, [isLoadMore]);
 
-    const handleDeleteConversation = () => {
-        // if(window.confirm('Do you want to delete?')){
-        //     dispatch(deleteConversation({auth, id}));
-        //     return nav('/message');
-        // }
-    }
+    
 
     // Call
     const caller = ({video}) => {
-        // const { _id, avatar, username, fullname } = user
+        const { _id, avatar, username, fullname } = user;
 
-        // const msg = {
-        //     sender: auth.user._id,
-        //     recipient: _id, 
-        //     avatar, username, fullname, video
-        // }
-        // dispatch({ type: GLOBAL_TYPES.CALL, payload: msg })
+        const msg = {
+            peerUser: user,
+            sender: auth.user._id,
+            recipient: _id, 
+            avatar, username, fullname, video
+        }
+        dispatch({ type: GLOBAL_TYPES.CALL, payload: msg });
     }
 
     const callUser = ({video}) => {
-        // const { _id, avatar, username, fullname } = auth.user
+        const { _id, avatar, username, fullname } = auth.user
 
-        // const msg = {
-        //     sender: _id,
-        //     recipient: user._id, 
-        //     avatar, username, fullname, video
-        // }
+        const msg = {
+            conversation: user.conversation,
+            sender: _id,
+            recipient: user._id, 
+            avatar, username, fullname, video
+        }
 
-        // if(peer.open) msg.peerId = peer._id
+        if(peer.open) 
+            msg.peerId = peer._id;
 
-        // socket.emit('callUser', msg)
+        socket.emit('callUser', msg);
     }
 
     const handleAudioCall = () => {
-        // caller({video: false})
-        // callUser({video: false})
+        caller({video: false})
+        callUser({video: false});
     }
     
     const handleVideoCall = () => {
-        // caller({video: true})
-        // callUser({video: true})
+        caller({video: true})
+        callUser({video: true});
     }
 
     return (
@@ -195,8 +193,7 @@ const RightSide = () => {
                             <i className="fas fa-video mx-3"
                             onClick={handleVideoCall} />
 
-                            <i className="fas fa-trash text-danger"
-                            onClick={handleDeleteConversation} />
+                            <i className="fas fa-trash text-danger" />
                         </div>
                     </Card>
                 }

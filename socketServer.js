@@ -12,6 +12,13 @@ const SocketServer = socket => {
     socket.on('disconnect', () => {
         for(const [userId, value] of Object.entries(consumersMap)){
             if(value && value.socketId === socket.id){
+                
+                //If having a call, inform the other disconnection
+                if(value.call && consumersMap[value.call]){
+                    socket.to(`${consumersMap[value.call].socketId}`).emit("callerDisconnect");
+                    consumersMap[value.call].call = null;
+                }
+
                 //Inform the followers know the user was offline
                 const followers = value.followers;
                 if(followers.length > 0){
@@ -111,6 +118,37 @@ const SocketServer = socket => {
             })
         }
         
+    })
+
+    //Call
+    socket.on("callUser", data => {
+        const {sender, recipient} = data;
+        consumersMap[sender].call = recipient;
+        console.log(data)
+        if(consumersMap[recipient]){
+            if(consumersMap[recipient].call)  //Calling with another
+                socket.emit("busyToMe");
+            
+            else{
+                socket.to(`${consumersMap[recipient].socketId}`).emit("callToClient", data);
+                consumersMap[recipient].call = sender;
+            }
+        }
+    })
+
+
+    socket.on("endCall", data => {
+        const {sender, recipient} = data;
+        
+        if(consumersMap[recipient]){
+            socket.to(`${consumersMap[recipient].socketId}`).emit("endCallToClient", data);
+            consumersMap[recipient].call = null;
+        }
+        
+        if(consumersMap[sender]){
+            socket.to(`${consumersMap[sender].socketId}`).emit("endCallToClient", data);
+            consumersMap[sender].call = null;
+        }
     })
 }
 

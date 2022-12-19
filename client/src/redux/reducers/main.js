@@ -9,6 +9,9 @@ import socketReducer from "./SocketReducer";
 import noticeReducer from './NoticeReducer';
 import messengerReducer from "./MessengerReducer";
 import onlineReducer from "./OnlineReducer";
+import callReducer from "./CallReducer";
+import peerReducer from "./PeerReducer";
+
 
 export default combineReducers({
     auth: authReducer, 
@@ -20,5 +23,7 @@ export default combineReducers({
     socket: socketReducer,
     notices: noticeReducer,
     message: messengerReducer,
-    online: onlineReducer
+    online: onlineReducer,
+    call: callReducer,
+    peer: peerReducer
 });

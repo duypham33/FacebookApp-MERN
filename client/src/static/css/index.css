@@ -72,6 +72,9 @@ img {
 /* -------- Icons---------- */
 @import url("./icons.css");
 
+/* -------- Call Modal---------- */
+@import url("./call_modal.css");
+
 
 /* --------- Responsive ------ */
 @media (max-width: 766px){

@@ -10,12 +10,12 @@ export const addUser = (user, message) => dispatch => {
 }
 
 export const addMessage = ({msg, peer, auth, socket}) => async dispatch => {
-    const socketData = {...auth.user, text: msg.text, media: msg.media}
+    const socketData = {...auth.user, text: msg.text, media: msg.media, call: msg.call}
     
     //Not the first time chat, otherwise need to wait for the response data
     if(peer.conversation){
         dispatch({type: GLOBAL_TYPES.ADD_MESSAGE, payload: {
-            peer: {...peer, text: msg.text, media: msg.media}, 
+            peer: {...peer, text: msg.text, media: msg.media, call: msg.call}, 
             msg: msg
         }});
 
@@ -27,7 +27,8 @@ export const addMessage = ({msg, peer, auth, socket}) => async dispatch => {
         
         if(!peer.conversation){
             dispatch({type: GLOBAL_TYPES.ADD_MESSAGE, payload: {
-                peer: {...peer, text: msg.text, media: msg.media, conversation: res.data.conversation}, 
+                peer: {...peer, text: msg.text, media: msg.media, 
+                    call: msg.call, conversation: res.data.conversation}, 
                 msg: msg
             }});
 
@@ -50,10 +51,10 @@ export const getConversations = ({auth}) => dispatch => {
 
         if(resultUsers > 0){
             res.data.conversations.forEach(chat => {
-                const {_id, recipients, text, media} = chat;
+                const {_id, recipients, text, media, call} = chat;
                 const peer = recipients.find(user => user._id !== auth.user._id);
 
-                newUsers.push({...peer, text: text, media: media, conversation: _id});
+                newUsers.push({...peer, text: text, media: media, call: call, conversation: _id});
             })
         }
 

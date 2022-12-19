@@ -15,13 +15,16 @@ import { getNotify } from './redux/actions/noticeActions';
 import io from 'socket.io-client';
 import GLOBAL_TYPES from './redux/actions/globalTypes';
 import SocketClient from './SocketClient';
+import CallModal from './Components/Message/CallModal';
+import Peer from 'peerjs';
+
 
 export const inverterContext = createContext();
 
 function App() {
   
   const dispatch = useDispatch();
-  const {auth, status, socket} = useSelector(state => state);
+  const {auth, status, socket, call} = useSelector(state => state);
   const [inverter, setInverter] = useState(0);
   
   //Authen
@@ -46,6 +49,15 @@ function App() {
 
   }, [auth.user]);
 
+
+  useEffect(() => {
+    const newPeer = new Peer(undefined, {
+      path: '/', secure: true
+    });
+
+    dispatch({type: GLOBAL_TYPES.PEER, payload: newPeer});
+  }, []);
+
   return (
 
     <inverterContext.Provider value={{inverter, setInverter}}>
@@ -58,6 +70,7 @@ function App() {
             {auth.user && <Header />}
             {(status.onCreate || status.onEdit) && <StatusModal />}
             {(auth.user && socket) && <SocketClient />}
+            {call && <CallModal /> }
 
             <Routes>
               <Route exact path="/" element={auth.user ? <Home /> : <Login />} />

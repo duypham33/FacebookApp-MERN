@@ -6,6 +6,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const {Server} = require('socket.io');
 const SocketServer = require('./socketServer');
+const {ExpressPeerServer} = require('peer');
 
 const app = express();
 app.use(express.json());
@@ -38,6 +39,8 @@ mongoose.connect(URI, {
     console.log('Connected to mongodb!')
 });
 
+//Create peer server
+ExpressPeerServer(http, {path: '/'});
 
 // Routes
 app.use('/api/auth', require('./Routes/AuthRouter'));

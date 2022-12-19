@@ -29,7 +29,7 @@ const messageCtrl = {
                 ]
             }, {
                 recipients: [req.userID, recipient],
-                text, media
+                text, media, call
             }, {new: true, upsert: true});
             
             const newMessage = await messageModel.create({
